@@ -1,20 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using AppContext = OfficeStaff.Persistence.AppContext;
 
-var builder = WebApplication.CreateBuilder(args);
+var modelBuilder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+modelBuilder.Services.AddControllers();
+modelBuilder.Services.AddEndpointsApiExplorer();
+modelBuilder.Services.AddSwaggerGen();
+modelBuilder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddDbContext<AppContext>(options =>
+modelBuilder.Services.AddDbContext<OfficeStaff.Persistence.AppContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(modelBuilder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-var app = builder.Build();
+var app = modelBuilder.Build();
 
 if (app.Environment.IsDevelopment())
 {
