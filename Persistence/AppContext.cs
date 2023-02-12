@@ -1,17 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OfficeStaff.Data.Models;
-using static OfficeStaff.Persistence.AppContext.PositionHistoryConfiguration;
 
 namespace OfficeStaff.Persistence
 {
-    public class AppContext : DbContext
+    public class ApplicationContext : DbContext
     {
-        public AppContext(DbContextOptions optins) : base(optins)
+        public ApplicationContext(DbContextOptions optins) : base(optins)
         {
 
         }
-
         public DbSet<Country> Countries { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -62,7 +60,6 @@ namespace OfficeStaff.Persistence
             {
                 builder.Property(e => e.FirstName).HasMaxLength(30);
                 builder.Property(e => e.LastName).HasMaxLength(30);
-                builder.Property(e => e.Name).HasComputedColumnSql("FirstName + ' ' + LastName");
             }
         }
 
@@ -72,6 +69,7 @@ namespace OfficeStaff.Persistence
             {
                 builder.Property(e => e.Name).IsRequired().HasMaxLength(30);
                 builder.HasIndex(e => e.Name).IsUnique();
+
             }
         }
 

@@ -1,14 +1,24 @@
 using Microsoft.EntityFrameworkCore;
+using OfficeStaff.Data.Interfaces;
+using OfficeStaff.Data.Repository;
+using OfficeStaff.Persistence;
 
 var modelBuilder = WebApplication.CreateBuilder(args);
 
 
 modelBuilder.Services.AddControllers();
-modelBuilder.Services.AddEndpointsApiExplorer();
-modelBuilder.Services.AddSwaggerGen();
 modelBuilder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-modelBuilder.Services.AddDbContext<OfficeStaff.Persistence.AppContext>(options =>
+modelBuilder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+modelBuilder.Services.AddScoped<ICountryRepository, CountryRepository>();
+modelBuilder.Services.AddScoped<ILocationRepository, LocationRepository>();
+modelBuilder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+modelBuilder.Services.AddScoped<IPositionRepository, PositionRepository>();
+
+modelBuilder.Services.AddEndpointsApiExplorer();
+modelBuilder.Services.AddSwaggerGen();
+
+modelBuilder.Services.AddDbContext<ApplicationContext>(options =>
 {
     options.UseSqlServer(modelBuilder.Configuration.GetConnectionString("DefaultConnection"));
 });

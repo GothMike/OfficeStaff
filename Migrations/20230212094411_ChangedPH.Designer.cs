@@ -12,8 +12,8 @@ using OfficeStaff.Persistence;
 namespace OfficeStaff.Migrations
 {
     [DbContext(typeof(Persistence.ApplicationContext))]
-    [Migration("20230211175005_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230212094411_ChangedPH")]
+    partial class ChangedPH
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,7 +89,7 @@ namespace OfficeStaff.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("nvarchar(max)")
-                        .HasComputedColumnSql("FirstName || ' ' || LastName");
+                        .HasComputedColumnSql("FirstName + ' ' + LastName");
 
                     b.Property<int>("PositionId")
                         .HasColumnType("int");
@@ -174,6 +174,9 @@ namespace OfficeStaff.Migrations
 
                     b.Property<int>("PositionId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("EmployeeId", "PositionId");
 

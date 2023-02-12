@@ -6,5 +6,6 @@
         public int PositionId { get; set; }
         public Employee? Employee { get; set; }
         public Position? Position { get; set; }
+        public DateTime? Created { get; set; }
     }
 }
