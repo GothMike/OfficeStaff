@@ -17,7 +17,7 @@ namespace OfficeStaff.Data.Repository
 
         public bool CreateEmployee(Employee employee, int departmentId, int positionId)
         {
-            var employeeDepartmentEntity = _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
+/*            var employeeDepartmentEntity = _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
             var employeePositionEntity = _applicationContext.Positions.Where(p => p.Id == positionId).FirstOrDefault();
 
             var newEmployee = new Employee()
@@ -25,8 +25,8 @@ namespace OfficeStaff.Data.Repository
                 Department = employeeDepartmentEntity,
                 Position = employeePositionEntity
             };
-
-            _applicationContext.Add(newEmployee);
+*/
+            _applicationContext.Add(employee);
 
             return Save();
         }
@@ -42,12 +42,12 @@ namespace OfficeStaff.Data.Repository
             return _applicationContext.Employees.Any(e => e.Id == employeeId);
         }
 
-        public Employee ReadEmployee(int employeeId)
+        public Employee GetEmployee(int employeeId)
         {
             return _applicationContext.Employees.Where(e => e.Id == employeeId).FirstOrDefault();
         }
 
-        public ICollection<Employee> ReadEmployees()
+        public ICollection<Employee> GetEmployees()
         {
             return _applicationContext.Employees.ToList();
         }

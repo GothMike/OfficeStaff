@@ -1,4 +1,6 @@
-﻿namespace OfficeStaff.Data.Dto
+﻿using OfficeStaff.Data.Models;
+
+namespace OfficeStaff.Data.Dto
 {
     public class DepartmentDto
     {

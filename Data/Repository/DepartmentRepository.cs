@@ -1,6 +1,7 @@
 ﻿using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
 using OfficeStaff.Persistence;
+using System.Diagnostics.Metrics;
 
 namespace OfficeStaff.Data.Repository
 {
@@ -30,19 +31,20 @@ namespace OfficeStaff.Data.Repository
            return _applicationContext.Departments.Any(d => d.Id == departmentId);
         }
 
-        public Department ReadDepartment(int departmentId)
+        public Department GetDepartment(int departmentId)
         {
             return _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
         }
 
-        public ICollection<Department> ReadDepartments()
+        public ICollection<Department> GetDepartments()
         {
             return _applicationContext.Departments.ToList();
         }
 
         public bool UpdateDepartment(Department department)
         {
-            throw new NotImplementedException();
+            _applicationContext.Departments.Update(department);
+            return Save();
         }
 
         public bool Save()

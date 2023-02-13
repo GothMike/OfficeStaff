@@ -19,15 +19,27 @@ namespace OfficeStaff.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
+        public IActionResult GetOwners() // возвращает список
+        {
+            var owners = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(owners);
+        }
+
         [HttpGet("{countryId}")]
         [ProducesResponseType(200, Type = typeof(Country))]
         [ProducesResponseType(400)]
-        public IActionResult ReadCountry(int countryId)
+        public IActionResult GetCountry(int countryId)
         {
             if (!_countryRepository.CountryExists(countryId))
                 return NotFound();
 
-            var country = _mapper.Map<CountryDto>(_countryRepository.ReadCountry(countryId));
+            var country = _mapper.Map<CountryDto>(_countryRepository.GetCountry(countryId));
 
 
             if (!ModelState.IsValid)
@@ -44,7 +56,7 @@ namespace OfficeStaff.Controllers
             if (countryCreate == null)
                 return BadRequest(ModelState);
 
-            var country = _countryRepository.ReadCountries().Where(c => c.Name.Trim().ToUpper() == countryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
+            var country = _countryRepository.GetCountries().Where(c => c.Name.Trim().ToUpper() == countryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
             if (country != null)
             {
@@ -64,6 +76,58 @@ namespace OfficeStaff.Controllers
             }
 
             return Ok("Успешно создано");
+        }
+
+        [HttpPut("{countryId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateCategory(int countryId, [FromBody] CountryDto updatedCountry)
+        {
+            if (updatedCountry == null)
+                return BadRequest();
+
+            if (countryId != updatedCountry.Id)
+                return BadRequest();
+
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countryMap = _mapper.Map<Country>(updatedCountry);
+
+            if (!_countryRepository.UpdateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании страны");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Страна {countryMap.Name} - отредактирована в базе данных");
+        }
+
+        [HttpDelete("{countryId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCountry(int countryId)
+        {
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound();
+
+            var countryToDelete = _countryRepository.GetCountry(countryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_countryRepository.DeleteCountry(countryToDelete))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при удалении страны");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Страна {countryToDelete.Name} - удалена из базы данных");
         }
     }
 }

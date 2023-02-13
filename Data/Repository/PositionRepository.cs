@@ -29,12 +29,12 @@ namespace OfficeStaff.Data.Repository
             return _applicationContext.Positions.Any(p => p.Id == positionId);
         }
 
-        public Position ReadPosition(int positionId)
+        public Position GetPosition(int positionId)
         {
             return _applicationContext.Positions.Where(p => p.Id == positionId).FirstOrDefault();
         }
 
-        public ICollection<Position> ReadPositons()
+        public ICollection<Position> GetPositions()
         {
             return _applicationContext.Positions.ToList();
         }

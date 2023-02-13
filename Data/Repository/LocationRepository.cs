@@ -29,12 +29,12 @@ namespace OfficeStaff.Data.Repository
             return _applicationContext.Locations.Any(l => l.Id == locationId);
         }
 
-        public Location ReadLocation(int locationId)
+        public Location GetLocation(int locationId)
         {
             return _applicationContext.Locations.Where(l => l.Id == locationId).FirstOrDefault();
         }
 
-        public ICollection<Location> ReadLocations()
+        public ICollection<Location> GetLocations()
         {
             return _applicationContext.Locations.ToList();
         }

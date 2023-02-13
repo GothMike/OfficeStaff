@@ -5,8 +5,8 @@ namespace OfficeStaff.Data.Interfaces
     public interface IEmployeeRepository
     {
         bool CreateEmployee(Employee employee, int departmentId, int positionId);
-        Employee ReadEmployee(int employeeId);
-        ICollection<Employee> ReadEmployees();
+        Employee GetEmployee(int employeeId);
+        ICollection<Employee> GetEmployees();
         bool UpdateEmployee(Employee employee, int departmentId, int positionId);
         bool DeleteEmployee(Employee employee);
         bool EmployeeExists(int employeeId);

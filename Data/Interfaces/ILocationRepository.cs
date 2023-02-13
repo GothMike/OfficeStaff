@@ -5,8 +5,8 @@ namespace OfficeStaff.Data.Interfaces
     public interface ILocationRepository
     {
         bool CreateLocation(Location Location);
-        Location ReadLocation(int locationId);
-        ICollection<Location> ReadLocations();
+        Location GetLocation(int locationId);
+        ICollection<Location> GetLocations();
         bool UpdateLocation(Location location);
         bool DeleteLocation(Location location);
         bool LocationExists(int locationId);

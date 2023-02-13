@@ -22,15 +22,27 @@ namespace OfficeStaff.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Department>))]
+        public IActionResult GetDepartments()
+        {
+            var departments = _mapper.Map<List<DepartmentDto>>(_departmentRepository.GetDepartments());
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(departments);
+        }
+
         [HttpGet("{departmentId}")]
         [ProducesResponseType(200, Type = typeof(Department))]
         [ProducesResponseType(400)]
-        public IActionResult ReadDepartment(int departmentId)
+        public IActionResult GetDepartment(int departmentId)
         {
             if (!_departmentRepository.DepartmentExists(departmentId))
                 return NotFound();
 
-            var department = _mapper.Map<DepartmentDto>(_departmentRepository.ReadDepartment(departmentId));
+            var department = _mapper.Map<DepartmentDto>(_departmentRepository.GetDepartment(departmentId));
 
 
             if (!ModelState.IsValid)
@@ -47,7 +59,7 @@ namespace OfficeStaff.Controllers
             if (departmentCreate == null)
                 return BadRequest(ModelState);
 
-            var department = _departmentRepository.ReadDepartments().Where(c => c.Name.Trim().ToUpper() == departmentCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
+            var department = _departmentRepository.GetDepartments().Where(c => c.Name.Trim().ToUpper() == departmentCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
             if (department != null)
             {
@@ -60,7 +72,7 @@ namespace OfficeStaff.Controllers
 
             var departmentMap = _mapper.Map<Department>(departmentCreate);
 
-            departmentMap.Location = _locationRepository.ReadLocation(locationId);
+            departmentMap.Location = _locationRepository.GetLocation(locationId);
 
             if (!_departmentRepository.CreateDepartment(departmentMap))
             {
@@ -69,6 +81,35 @@ namespace OfficeStaff.Controllers
             }
 
             return Ok("Успешно создано");
+        }
+
+        [HttpPut("{departmentId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateDepartment(int departmentId,[FromQuery] int LocationId [FromBody], DepartmentDto departmentCreate)
+        {
+            if (departmentCreate == null)
+                return BadRequest();
+
+            if (departmentId != departmentCreate.Id)
+                return BadRequest();
+
+            if (!_departmentRepository.DepartmentExists(departmentId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var departmentMap = _mapper.Map<Department>(departmentCreate);
+
+            if (!_departmentRepository.UpdateDepartment(departmentMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании департамента");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Департамент {departmentMap.Name} - отредактирован в базе данных");
         }
 
 

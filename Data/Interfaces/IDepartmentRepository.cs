@@ -5,8 +5,8 @@ namespace OfficeStaff.Data.Interfaces
     public interface IDepartmentRepository
     {
         bool CreateDepartment(Department department);
-        Department ReadDepartment(int departmentId);
-        ICollection<Department> ReadDepartments();
+        Department GetDepartment(int departmentId);
+        ICollection<Department> GetDepartments();
         bool UpdateDepartment(Department department);
         bool DeleteDepartment(Department department);
         bool DepartmentExists(int departmentId);

@@ -1,4 +1,5 @@
-﻿using OfficeStaff.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
 using OfficeStaff.Persistence;
 
@@ -25,23 +26,24 @@ namespace OfficeStaff.Data.Repository
 
         public bool DeleteCountry(Country country)
         {
-            throw new NotImplementedException();
+            _applicationContext.Remove(country);
+            return Save();
         }
 
-        public ICollection<Country> ReadCountries()
+        public ICollection<Country> GetCountries()
         {
            return _applicationContext.Countries.ToList();
         }
 
-        public Country ReadCountry(int countryId)
+        public Country GetCountry(int countryId)
         {
             return _applicationContext.Countries.Where(c => c.Id == countryId).FirstOrDefault();
         }
 
-
         public bool UpdateCountry(Country country)
         {
-            throw new NotImplementedException();
+            _applicationContext.Countries.Update(country);
+            return Save();
         }
 
         public bool Save()
