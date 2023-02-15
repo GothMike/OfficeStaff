@@ -38,7 +38,19 @@ namespace OfficeStaff.Controllers
 
             return Ok(location);
         }
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Location>))]
+        [ProducesResponseType(400)]
+        public IActionResult ReadLocations()
+        {
+            var locations = _mapper.Map<List<LocationDto>>(_locationRepository.GetLocations());
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(locations);
+        }
+         
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -71,6 +83,60 @@ namespace OfficeStaff.Controllers
             return Ok("Успешно создано");
         }
 
+        [HttpPut("{locationId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateLocation(int locationId,[FromQuery] int countryId ,[FromBody] LocationDto updatedLocation)
+        {
+            if (updatedLocation == null)
+                return BadRequest();
+
+            if (locationId != updatedLocation.Id)
+                return BadRequest();
+
+            if (!_locationRepository.LocationExists(locationId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var locationMap = _mapper.Map<Location>(updatedLocation);
+
+            locationMap.Country = _countryRepository.GetCountry(countryId);
+
+
+            if (!_locationRepository.UpdateLocation(locationMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании локации");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Локация '{locationMap.Name}' - отредактирована в базе данных");
+        }
+
+        [HttpDelete("{locationId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteLocation(int locationId)
+        {
+            if (!_locationRepository.LocationExists(locationId))
+                return NotFound();
+
+            var locationToDelete = _locationRepository.GetLocation(locationId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_locationRepository.DeleteLocation(locationToDelete))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при удалении страны");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Локация {locationToDelete.Name} - удалена из базы данных");
+        }
 
 
 

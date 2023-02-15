@@ -1,6 +1,7 @@
 ﻿using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
 using OfficeStaff.Persistence;
+using System.Diagnostics.Metrics;
 
 namespace OfficeStaff.Data.Repository
 {
@@ -21,7 +22,8 @@ namespace OfficeStaff.Data.Repository
 
         public bool DeleteLocation(Location Location)
         {
-            throw new NotImplementedException();
+            _applicationContext.Remove(Location);
+            return Save();
         }
 
         public bool LocationExists(int locationId)
@@ -41,7 +43,8 @@ namespace OfficeStaff.Data.Repository
 
         public bool UpdateLocation(Location Location)
         {
-            throw new NotImplementedException();
+            _applicationContext.Locations.Update(Location);
+            return Save();
         }
 
         public bool Save()

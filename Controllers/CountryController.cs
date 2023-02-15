@@ -23,12 +23,12 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
         public IActionResult GetOwners() // возвращает список
         {
-            var owners = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
+            var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(owners);
+            return Ok(countries);
         }
 
         [HttpGet("{countryId}")]

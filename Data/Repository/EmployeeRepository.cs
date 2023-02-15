@@ -14,7 +14,6 @@ namespace OfficeStaff.Data.Repository
             _applicationContext = applicationContext;
         }
 
-
         public bool CreateEmployee(Employee employee, int departmentId, int positionId)
         {
 /*            var employeeDepartmentEntity = _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
