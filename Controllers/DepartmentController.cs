@@ -87,7 +87,7 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateDepartment(int departmentId,[FromQuery] int LocationId, [FromBody] DepartmentDto departmentCreate)
+        public IActionResult UpdateDepartment(int departmentId,[FromQuery] int locationId, [FromBody] DepartmentDto departmentCreate)
         {
             if (departmentCreate == null)
                 return BadRequest();
@@ -103,6 +103,8 @@ namespace OfficeStaff.Controllers
 
             var departmentMap = _mapper.Map<Department>(departmentCreate);
 
+            departmentMap.Location = _locationRepository.GetLocation(locationId);
+
             if (!_departmentRepository.UpdateDepartment(departmentMap))
             {
                 ModelState.AddModelError("", "Что-то пошло не так при редактировании департамента");
@@ -110,6 +112,29 @@ namespace OfficeStaff.Controllers
             }
 
             return Ok($"Департамент {departmentMap.Name} - отредактирован в базе данных");
+        }
+
+        [HttpDelete("{departmentId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteDepartment(int departmentId)
+        {
+            if (!_departmentRepository.DepartmentExists(departmentId))
+                return NotFound();
+
+            var departmentToDelete = _departmentRepository.GetDepartment(departmentId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_departmentRepository.DeleteDepartment(departmentToDelete))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при удалении департамента");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Департамент {departmentToDelete.Name} - удалена из базы данных");
         }
 
 

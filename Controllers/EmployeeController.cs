@@ -89,5 +89,60 @@ namespace OfficeStaff.Controllers
 
             return Ok(employees);
         }
+
+
+        [HttpPut("{employeeId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateEmployee(int employeeId, [FromQuery] int departmentId, [FromBody] EmployeeDto updateEmployee)
+        {
+            if (updateEmployee == null)
+                return BadRequest();
+
+            if (employeeId != updateEmployee.Id)
+                return BadRequest();
+
+            if (!_employeeRepository.EmployeeExists(employeeId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var employeeMap = _mapper.Map<Employee>(updateEmployee);
+
+            employeeMap.Department = _departmentRepository.GetDepartment(departmentId);
+
+            if (!_employeeRepository.UpdateEmployee(employeeMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании сотрудника");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Сотрудник {employeeMap.FirstName } {employeeMap.LastName} - отредактирована в базе данных");
+        }
+
+        [HttpDelete("{employeeId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteLocation(int employeeId)
+        {
+            if (!_employeeRepository.EmployeeExists(employeeId))
+                return NotFound();
+
+            var employeeToDelete = _employeeRepository.GetEmployee(employeeId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_employeeRepository.DeleteEmployee(employeeToDelete))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при удалении сотрудника");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Сотрудник {employeeToDelete.FirstName} {employeeToDelete.LastName} - удален из базы данных");
+        }
     }
 }

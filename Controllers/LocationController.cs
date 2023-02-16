@@ -22,6 +22,20 @@ namespace OfficeStaff.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Location>))]
+        [ProducesResponseType(400)]
+        public IActionResult ReadLocations()
+        {
+            var locations = _mapper.Map<List<LocationDto>>(_locationRepository.GetLocations());
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(locations);
+        }
+
+
         [HttpGet("{locationId}")]
         [ProducesResponseType(200, Type = typeof(Location))]
         [ProducesResponseType(400)]
@@ -38,19 +52,7 @@ namespace OfficeStaff.Controllers
 
             return Ok(location);
         }
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Location>))]
-        [ProducesResponseType(400)]
-        public IActionResult ReadLocations()
-        {
-            var locations = _mapper.Map<List<LocationDto>>(_locationRepository.GetLocations());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(locations);
-        }
-         
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -131,7 +133,7 @@ namespace OfficeStaff.Controllers
 
             if (!_locationRepository.DeleteLocation(locationToDelete))
             {
-                ModelState.AddModelError("", "Что-то пошло не так при удалении страны");
+                ModelState.AddModelError("", "Что-то пошло не так при удалении локации");
                 return StatusCode(500, ModelState);
             }
 

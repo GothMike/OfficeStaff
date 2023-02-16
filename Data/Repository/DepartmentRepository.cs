@@ -22,7 +22,7 @@ namespace OfficeStaff.Data.Repository
 
         public bool DeleteDepartment(Department department)
         {
-            _applicationContext.Add(department);
+            _applicationContext.Remove(department);
             return Save();
         }
 
