@@ -32,15 +32,13 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<PositionHistory> builder)
             {
-                builder.HasKey(pc => new { pc.EmployeeId, pc.PositionId });
+                builder.HasKey(pc => pc.ChangeId);
                 builder
-                    .HasOne(e => e.Employee)
-                    .WithMany(ph => ph.PositionHistory)
-                    .HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.Restrict);
+                    .HasMany(e => e.Employees)
+                    .WithMany(e => e.PositionHistory);
                 builder
-                    .HasOne(p => p.Position)
-                    .WithMany(ph => ph.PositionHistory)
-                    .HasForeignKey(p => p.PositionId).OnDelete(DeleteBehavior.Restrict);
+                    .HasMany(e => e.Positions)
+                    .WithMany(e => e.PositionHistory);
             }
         }
 
@@ -48,9 +46,8 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<Department> builder)
             {
-                builder.HasOne(e => e.Location).WithMany(c => c.Departments).HasForeignKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
-                builder.Property(e => e.Name).IsRequired().HasMaxLength(30);
-                builder.HasIndex(e => e.Name).IsUnique();
+                builder.HasOne(e => e.Location).WithMany(c => c.Departments).HasForeignKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+                builder.Property(e => e.Name).IsRequired().HasMaxLength(40);
             }
         }
 
@@ -58,6 +55,7 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<Employee> builder)
             {
+                builder.HasOne(e => e.Position).WithMany(c => c.Employees).OnDelete(DeleteBehavior.SetNull);
                 builder.Property(e => e.FirstName).HasMaxLength(30);
                 builder.Property(e => e.LastName).HasMaxLength(30);
             }
@@ -69,7 +67,6 @@ namespace OfficeStaff.Persistence
             {
                 builder.Property(e => e.Name).IsRequired().HasMaxLength(30);
                 builder.HasIndex(e => e.Name).IsUnique();
-
             }
         }
 
@@ -79,10 +76,6 @@ namespace OfficeStaff.Persistence
             {
                 builder.Property(e => e.Name).IsRequired().HasMaxLength(30);
                 builder.HasIndex(e => e.Name).IsUnique();
-                builder.HasData(
-                    new Position { Id = 1, Name = "Менеджер" },
-                    new Position { Id = 2, Name = "Сотрудник"}
-                );
             }
         }
 
@@ -90,7 +83,8 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<Location> builder)
             {
-                builder.Property(e => e.Name).IsRequired().HasMaxLength(30);
+                builder.HasOne(e => e.Country).WithMany(e => e.Locations).HasForeignKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+                builder.Property(e => e.Name).IsRequired().HasMaxLength(50);
                 builder.HasIndex(e => e.Name).IsUnique();
             }
         }

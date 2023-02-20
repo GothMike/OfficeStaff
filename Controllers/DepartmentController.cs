@@ -44,7 +44,6 @@ namespace OfficeStaff.Controllers
 
             var department = _mapper.Map<DepartmentDto>(_departmentRepository.GetDepartment(departmentId));
 
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -58,6 +57,9 @@ namespace OfficeStaff.Controllers
         {
             if (departmentCreate == null)
                 return BadRequest(ModelState);
+
+            if (!_locationRepository.LocationExists(locationId))
+                return NotFound("Локация не найдена");
 
             var department = _departmentRepository.GetDepartments().Where(c => c.Name.Trim().ToUpper() == departmentCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
@@ -136,9 +138,5 @@ namespace OfficeStaff.Controllers
 
             return Ok($"Департамент {departmentToDelete.Name} - удалена из базы данных");
         }
-
-
-
-
     }
 }

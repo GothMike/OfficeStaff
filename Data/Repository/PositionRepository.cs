@@ -21,7 +21,8 @@ namespace OfficeStaff.Data.Repository
 
         public bool DeletePosition(Position position)
         {
-            throw new NotImplementedException();
+            _applicationContext.Remove(position);
+            return Save();
         }
 
         public bool PositionExists(int positionId)
@@ -41,7 +42,8 @@ namespace OfficeStaff.Data.Repository
 
         public bool UpdatePosition(Position position)
         {
-            throw new NotImplementedException();
+            _applicationContext.Positions.Update(position);
+            return Save();
         }
 
         public bool Save()

@@ -26,6 +26,36 @@ namespace OfficeStaff.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("{employeeId}")]
+        [ProducesResponseType(200, Type = typeof(Employee))]
+        [ProducesResponseType(400)]
+        public IActionResult GetEmployee(int employeeId)
+        {
+            if (!_employeeRepository.EmployeeExists(employeeId))
+                return NotFound();
+
+            var employee = _mapper.Map<EmployeeDto>(_employeeRepository.GetEmployee(employeeId));
+
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(employee);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Employee>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetEmployees()
+        {
+            var employees = _mapper.Map<List<EmployeeDto>>(_employeeRepository.GetEmployees());
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(employees);
+        }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -33,6 +63,12 @@ namespace OfficeStaff.Controllers
         {
             if (employeeCreated == null)
                 return BadRequest(ModelState);
+
+            if (!_departmentRepository.DepartmentExists(departmentId))
+                return NotFound("Департамент не найден");
+
+            if (!_positionRepository.PositionExists(positionId))
+                return NotFound("Позиция не найдена");
 
             var employees = _employeeRepository.GetEmployees().Where(e => e.LastName.Trim().ToUpper() == employeeCreated.LastName.TrimEnd().ToUpper()).FirstOrDefault();
 
@@ -50,46 +86,14 @@ namespace OfficeStaff.Controllers
             employeeMap.Department = _departmentRepository.GetDepartment(departmentId);
             employeeMap.Position = _positionRepository.GetPosition(positionId);
 
-
             if (!_employeeRepository.CreateEmployee(employeeMap, departmentId, positionId))
             {
-                ModelState.AddModelError("", "Something went wrong while savin");
+                ModelState.AddModelError("", "Что то пошло не так при создании сотрудника");
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Successfully created");
+            return Ok("Успешно создано");
         }
-
-        [HttpGet("{employeeId}")]
-        [ProducesResponseType(200, Type = typeof(Employee))]
-        [ProducesResponseType(400)]
-        public IActionResult ReadEmployee(int employeeId)
-        {
-            if(!_employeeRepository.EmployeeExists(employeeId))
-                return NotFound();
-
-            var employee = _mapper.Map<EmployeeDto>(_employeeRepository.GetEmployee(employeeId));
-
-
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                return Ok(employee);
-            }
-
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Employee>))]
-        [ProducesResponseType(400)]
-        public IActionResult ReadEmployees()
-        {
-            var employees = _mapper.Map<List<EmployeeDto>>(_employeeRepository.GetEmployees());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(employees);
-        }
-
 
         [HttpPut("{employeeId}")]
         [ProducesResponseType(400)]
@@ -126,7 +130,7 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteLocation(int employeeId)
+        public IActionResult DeleteEmployee(int employeeId)
         {
             if (!_employeeRepository.EmployeeExists(employeeId))
                 return NotFound();

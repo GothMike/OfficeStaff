@@ -25,7 +25,7 @@ namespace OfficeStaff.Controllers
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Location>))]
         [ProducesResponseType(400)]
-        public IActionResult ReadLocations()
+        public IActionResult GetLocations()
         {
             var locations = _mapper.Map<List<LocationDto>>(_locationRepository.GetLocations());
 
@@ -39,7 +39,7 @@ namespace OfficeStaff.Controllers
         [HttpGet("{locationId}")]
         [ProducesResponseType(200, Type = typeof(Location))]
         [ProducesResponseType(400)]
-        public IActionResult ReadLocation(int locationId)
+        public IActionResult GetLocation(int locationId)
         {
             if (!_locationRepository.LocationExists(locationId))
                 return NotFound();
@@ -60,6 +60,9 @@ namespace OfficeStaff.Controllers
         {
             if (locationCreate == null)
                 return BadRequest(ModelState);
+
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound("Страна не найдена");
 
             var location = _locationRepository.GetLocations().Where(c => c.Name.Trim().ToUpper() == locationCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
@@ -139,11 +142,5 @@ namespace OfficeStaff.Controllers
 
             return Ok($"Локация {locationToDelete.Name} - удалена из базы данных");
         }
-
-
-
-
-
-
     }
 }

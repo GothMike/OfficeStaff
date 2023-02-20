@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OfficeStaff.Persistence;
 
@@ -11,12 +10,10 @@ using OfficeStaff.Persistence;
 
 namespace OfficeStaff.Migrations
 {
-    [DbContext(typeof(Persistence.ApplicationContext))]
-    [Migration("20230211175005_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(ApplicationContext))]
+    partial class ApplicationContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,6 +21,21 @@ namespace OfficeStaff.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("EmployeePositionHistory", b =>
+                {
+                    b.Property<int>("EmployeesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PositionHistoryChangeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeesId", "PositionHistoryChangeId");
+
+                    b.HasIndex("PositionHistoryChangeId");
+
+                    b.ToTable("EmployeePositionHistory");
+                });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Country", b =>
                 {
@@ -53,13 +65,10 @@ namespace OfficeStaff.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Departments");
                 });
@@ -85,16 +94,10 @@ namespace OfficeStaff.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("nvarchar(max)")
-                        .HasComputedColumnSql("FirstName || ' ' || LastName");
-
-                    b.Property<int>("PositionId")
+                    b.Property<int?>("PositionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("managerIdId")
+                    b.Property<int?>("managerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -103,30 +106,20 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.HasIndex("managerIdId");
-
                     b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -142,6 +135,9 @@ namespace OfficeStaff.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsAManagerPosition")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -153,33 +149,52 @@ namespace OfficeStaff.Migrations
                         .IsUnique();
 
                     b.ToTable("Positions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Менеджер"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Сотрудник"
-                        });
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.PositionHistory", b =>
                 {
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("ChangeId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PositionId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChangeId"));
 
-                    b.HasKey("EmployeeId", "PositionId");
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("PositionId");
+                    b.HasKey("ChangeId");
 
                     b.ToTable("PositionHistory");
+                });
+
+            modelBuilder.Entity("PositionPositionHistory", b =>
+                {
+                    b.Property<int>("PositionHistoryChangeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PositionsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PositionHistoryChangeId", "PositionsId");
+
+                    b.HasIndex("PositionsId");
+
+                    b.ToTable("PositionPositionHistory");
+                });
+
+            modelBuilder.Entity("EmployeePositionHistory", b =>
+                {
+                    b.HasOne("OfficeStaff.Data.Models.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("EmployeesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OfficeStaff.Data.Models.PositionHistory", null)
+                        .WithMany()
+                        .HasForeignKey("PositionHistoryChangeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Department", b =>
@@ -187,7 +202,7 @@ namespace OfficeStaff.Migrations
                     b.HasOne("OfficeStaff.Data.Models.Location", "Location")
                         .WithMany("Departments")
                         .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Location");
@@ -202,50 +217,39 @@ namespace OfficeStaff.Migrations
                         .IsRequired();
 
                     b.HasOne("OfficeStaff.Data.Models.Position", "Position")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OfficeStaff.Data.Models.Employee", "managerId")
-                        .WithMany()
-                        .HasForeignKey("managerIdId");
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Department");
 
                     b.Navigation("Position");
-
-                    b.Navigation("managerId");
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
                 {
                     b.HasOne("OfficeStaff.Data.Models.Country", "Country")
                         .WithMany("Locations")
-                        .HasForeignKey("CountryId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("OfficeStaff.Data.Models.PositionHistory", b =>
+            modelBuilder.Entity("PositionPositionHistory", b =>
                 {
-                    b.HasOne("OfficeStaff.Data.Models.Employee", "Employee")
-                        .WithMany("PositionHistory")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("OfficeStaff.Data.Models.PositionHistory", null)
+                        .WithMany()
+                        .HasForeignKey("PositionHistoryChangeId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OfficeStaff.Data.Models.Position", "Position")
-                        .WithMany("PositionHistory")
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("OfficeStaff.Data.Models.Position", null)
+                        .WithMany()
+                        .HasForeignKey("PositionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Country", b =>
@@ -258,11 +262,6 @@ namespace OfficeStaff.Migrations
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("OfficeStaff.Data.Models.Employee", b =>
-                {
-                    b.Navigation("PositionHistory");
-                });
-
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
                 {
                     b.Navigation("Departments");
@@ -270,7 +269,7 @@ namespace OfficeStaff.Migrations
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Position", b =>
                 {
-                    b.Navigation("PositionHistory");
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

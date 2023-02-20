@@ -21,7 +21,7 @@ namespace OfficeStaff.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
-        public IActionResult GetOwners() // возвращает список
+        public IActionResult GetCountries() // возвращает список
         {
             var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
 
