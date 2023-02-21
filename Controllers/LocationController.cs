@@ -35,7 +35,6 @@ namespace OfficeStaff.Controllers
             return Ok(locations);
         }
 
-
         [HttpGet("{locationId}")]
         [ProducesResponseType(200, Type = typeof(Location))]
         [ProducesResponseType(400)]

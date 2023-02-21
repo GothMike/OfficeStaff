@@ -151,7 +151,7 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var employeeMap = _mapper.Map<Employee>(updateEmployee);
+            var employeeMap = _employeeRepository.GetEmployee(employeeId);
 
             employeeMap.Position = _positionRepository.GetPosition(positionId);
 
@@ -226,8 +226,6 @@ namespace OfficeStaff.Controllers
                     employee.managerId = null;
                 }
             }
-
-
 
             var employeeToDelete = _employeeRepository.GetEmployee(employeeId);
 

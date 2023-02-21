@@ -25,19 +25,6 @@ namespace OfficeStaff.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PositionHistory",
-                columns: table => new
-                {
-                    ChangeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PositionHistory", x => x.ChangeId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Positions",
                 columns: table => new
                 {
@@ -65,30 +52,6 @@ namespace OfficeStaff.Migrations
                         name: "FK_Locations_Countries_Id",
                         column: x => x.Id,
                         principalTable: "Countries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PositionPositionHistory",
-                columns: table => new
-                {
-                    PositionHistoryChangeId = table.Column<int>(type: "int", nullable: false),
-                    PositionsId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PositionPositionHistory", x => new { x.PositionHistoryChangeId, x.PositionsId });
-                    table.ForeignKey(
-                        name: "FK_PositionPositionHistory_PositionHistory_PositionHistoryChangeId",
-                        column: x => x.PositionHistoryChangeId,
-                        principalTable: "PositionHistory",
-                        principalColumn: "ChangeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PositionPositionHistory_Positions_PositionsId",
-                        column: x => x.PositionsId,
-                        principalTable: "Positions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -141,26 +104,29 @@ namespace OfficeStaff.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeePositionHistory",
+                name: "PositionHistory",
                 columns: table => new
                 {
-                    EmployeesId = table.Column<int>(type: "int", nullable: false),
-                    PositionHistoryChangeId = table.Column<int>(type: "int", nullable: false)
+                    ChangeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    PositionId = table.Column<int>(type: "int", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeePositionHistory", x => new { x.EmployeesId, x.PositionHistoryChangeId });
+                    table.PrimaryKey("PK_PositionHistory", x => x.ChangeId);
                     table.ForeignKey(
-                        name: "FK_EmployeePositionHistory_Employees_EmployeesId",
-                        column: x => x.EmployeesId,
+                        name: "FK_PositionHistory_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EmployeePositionHistory_PositionHistory_PositionHistoryChangeId",
-                        column: x => x.PositionHistoryChangeId,
-                        principalTable: "PositionHistory",
-                        principalColumn: "ChangeId",
+                        name: "FK_PositionHistory_Positions_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "Positions",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -169,11 +135,6 @@ namespace OfficeStaff.Migrations
                 table: "Countries",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EmployeePositionHistory_PositionHistoryChangeId",
-                table: "EmployeePositionHistory",
-                column: "PositionHistoryChangeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",
@@ -192,9 +153,14 @@ namespace OfficeStaff.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PositionPositionHistory_PositionsId",
-                table: "PositionPositionHistory",
-                column: "PositionsId");
+                name: "IX_PositionHistory_EmployeeId",
+                table: "PositionHistory",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PositionHistory_PositionId",
+                table: "PositionHistory",
+                column: "PositionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Positions_Name",
@@ -207,16 +173,10 @@ namespace OfficeStaff.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EmployeePositionHistory");
-
-            migrationBuilder.DropTable(
-                name: "PositionPositionHistory");
+                name: "PositionHistory");
 
             migrationBuilder.DropTable(
                 name: "Employees");
-
-            migrationBuilder.DropTable(
-                name: "PositionHistory");
 
             migrationBuilder.DropTable(
                 name: "Departments");

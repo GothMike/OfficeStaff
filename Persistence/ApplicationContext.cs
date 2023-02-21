@@ -33,12 +33,15 @@ namespace OfficeStaff.Persistence
             public void Configure(EntityTypeBuilder<PositionHistory> builder)
             {
                 builder.HasKey(pc => pc.ChangeId);
+                builder.HasOne(e => e.Employee)
+                    .WithMany(e => e.PositionHistory)
+                    .HasForeignKey(e => e.EmployeeId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 builder
-                    .HasMany(e => e.Employees)
-                    .WithMany(e => e.PositionHistory);
-                builder
-                    .HasMany(e => e.Positions)
-                    .WithMany(e => e.PositionHistory);
+                    .HasOne(e => e.Position)
+                    .WithMany(e => e.PositionHistory)
+                    .HasForeignKey(e => e.PositionId)
+                    .OnDelete(DeleteBehavior.Cascade);
             }
         }
 

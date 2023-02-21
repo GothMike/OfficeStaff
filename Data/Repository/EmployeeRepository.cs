@@ -18,12 +18,21 @@ namespace OfficeStaff.Data.Repository
         {
             /*var employeeDepartmentEntity = _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
             var employeePositionEntity = _applicationContext.Positions.Where(p => p.Id == positionId).FirstOrDefault();
-
+            
             var newEmployee = new Employee()
             {
                 Department = employeeDepartmentEntity,
                 Position = employeePositionEntity
             };*/
+
+            var positionHistory = new PositionHistory()
+            {
+                Employee = employee,
+                Position = _applicationContext.Positions.Where(e => e.Id == positionId).FirstOrDefault(),
+                Created = DateTime.Now,
+            };
+
+            _applicationContext.PositionHistory.Add(positionHistory);
             _applicationContext.Add(employee);
 
             return Save();
