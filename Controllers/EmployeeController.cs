@@ -26,6 +26,21 @@ namespace OfficeStaff.Controllers
             _mapper = mapper;
         }
 
+       
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Employee>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetEmployees()
+        {
+            var employees = _mapper.Map<List<EmployeeDto>>(_employeeRepository.GetEmployees());
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(employees);
+        }
+
         [HttpGet("{employeeId}")]
         [ProducesResponseType(200, Type = typeof(Employee))]
         [ProducesResponseType(400)]
@@ -41,19 +56,6 @@ namespace OfficeStaff.Controllers
                 return BadRequest(ModelState);
 
             return Ok(employee);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Employee>))]
-        [ProducesResponseType(400)]
-        public IActionResult GetEmployees()
-        {
-            var employees = _mapper.Map<List<EmployeeDto>>(_employeeRepository.GetEmployees());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(employees);
         }
 
         [HttpPost]
@@ -107,6 +109,9 @@ namespace OfficeStaff.Controllers
             if (employeeId != updateEmployee.Id)
                 return BadRequest();
 
+            if (!_departmentRepository.DepartmentExists(departmentId))
+                return NotFound("Департамент не найден");
+
             if (!_employeeRepository.EmployeeExists(employeeId))
                 return NotFound();
 
@@ -126,6 +131,81 @@ namespace OfficeStaff.Controllers
             return Ok($"Сотрудник {employeeMap.FirstName } {employeeMap.LastName} - отредактирована в базе данных");
         }
 
+        [HttpPut("{employeeId}/ChangeAPosition")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult ChangeAPositionAnEmployee(int employeeId, [FromQuery] int positionId, [FromBody] EmployeeDto updateEmployee)
+        {
+            if (updateEmployee == null)
+                return BadRequest();
+
+            if (employeeId != updateEmployee.Id)
+                return BadRequest();
+            if (!_positionRepository.PositionExists(positionId))
+                return NotFound("Позиция не найдена");
+
+            if (!_employeeRepository.EmployeeExists(employeeId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var employeeMap = _mapper.Map<Employee>(updateEmployee);
+
+            employeeMap.Position = _positionRepository.GetPosition(positionId);
+
+            if (!_employeeRepository.UpdateEmployee(employeeMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании сотрудника");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Сотрудник {employeeMap.FirstName} {employeeMap.LastName} - отредактирована в базе данных");
+        }
+
+        [HttpPut("{employeeId}/SetAManager")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult SetAManager(int employeeId, [FromQuery] int managerId, [FromBody] EmployeeDto updateEmployee)
+        {
+            var managerPosition = _positionRepository.GetPosition((int)_employeeRepository.GetEmployee(managerId).PositionId);
+
+            if (updateEmployee == null)
+                return BadRequest();
+
+            if (employeeId != updateEmployee.Id)
+                return BadRequest();
+
+            if (!_employeeRepository.EmployeeExists(managerId))
+                return NotFound("Менеджер не найден");
+
+            if(!managerPosition.IsAManagerPosition)
+                return NotFound("Этот сотрудник не менеджер");
+
+            if (!_employeeRepository.EmployeeExists(employeeId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var employeeMap = _employeeRepository.GetEmployee(employeeId);
+
+            employeeMap.managerId = managerId;
+
+
+            if (!_employeeRepository.UpdateEmployee(employeeMap))
+            {
+                ModelState.AddModelError("", "Что-то пошло не так при редактировании сотрудника");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok($"Сотрудник {employeeMap.FirstName} {employeeMap.LastName} - отредактирована в базе данных");
+        }
+
+
+
         [HttpDelete("{employeeId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -134,6 +214,20 @@ namespace OfficeStaff.Controllers
         {
             if (!_employeeRepository.EmployeeExists(employeeId))
                 return NotFound();
+
+            var managerPosition = _positionRepository.GetPosition((int)_employeeRepository.GetEmployee(employeeId).PositionId);
+
+            if (managerPosition.IsAManagerPosition)
+            {
+               IEnumerable<Employee> managersemployee = _employeeRepository.GetEmployees().Where(c => c.managerId == employeeId);
+
+                foreach (var employee in managersemployee)
+                {
+                    employee.managerId = null;
+                }
+            }
+
+
 
             var employeeToDelete = _employeeRepository.GetEmployee(employeeId);
 

@@ -34,7 +34,7 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionHistoryChangeId");
 
-                    b.ToTable("EmployeePositionHistory");
+                    b.ToTable("EmployeePositionHistory", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Country", b =>
@@ -55,7 +55,7 @@ namespace OfficeStaff.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Department", b =>
@@ -70,7 +70,7 @@ namespace OfficeStaff.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Employee", b =>
@@ -106,7 +106,7 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
@@ -124,7 +124,7 @@ namespace OfficeStaff.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Position", b =>
@@ -148,7 +148,7 @@ namespace OfficeStaff.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.PositionHistory", b =>
@@ -164,7 +164,7 @@ namespace OfficeStaff.Migrations
 
                     b.HasKey("ChangeId");
 
-                    b.ToTable("PositionHistory");
+                    b.ToTable("PositionHistory", (string)null);
                 });
 
             modelBuilder.Entity("PositionPositionHistory", b =>
@@ -179,7 +179,7 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionsId");
 
-                    b.ToTable("PositionPositionHistory");
+                    b.ToTable("PositionPositionHistory", (string)null);
                 });
 
             modelBuilder.Entity("EmployeePositionHistory", b =>
