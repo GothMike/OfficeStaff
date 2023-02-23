@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeStaff.Data.Dto;
-using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
-using OfficeStaff.Data.Repository;
+using OfficeStaff.Data.Repository.Interfaces;
+using OfficeStaff.Data.Services.Interfaces;
 
 namespace OfficeStaff.Controllers
 {
@@ -12,23 +11,21 @@ namespace OfficeStaff.Controllers
     public class CountryController : Controller
     {
         private readonly ICountryRepository _countryRepository;
-        private readonly IMapper _mapper;
-        public CountryController(ICountryRepository countryRepository, IMapper mapper)
+        private readonly ICountryService _countryService;
+        public CountryController(ICountryRepository countryRepository, ICountryService countryService)
         {
             _countryRepository = countryRepository;
-            _mapper = mapper;
+            _countryService = countryService;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Country>))]
-        public IActionResult GetCountries() // возвращает список
+        public IActionResult GetCountries() 
         {
-            var countries = _mapper.Map<List<CountryDto>>(_countryRepository.GetCountries());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(countries);
+            return Ok(_countryService.GetCountries());
         }
 
         [HttpGet("{countryId}")]
@@ -39,13 +36,10 @@ namespace OfficeStaff.Controllers
             if (!_countryRepository.CountryExists(countryId))
                 return NotFound();
 
-            var country = _mapper.Map<CountryDto>(_countryRepository.GetCountry(countryId));
-
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(country);
+            return Ok(_countryService.GetCountry(countryId));
         }
 
         [HttpPost]
@@ -53,10 +47,10 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateCountry([FromBody] CountryDto countryCreate)
         {
+            var country = _countryRepository.GetCountries().Where(c => c.Name.Trim().ToUpper() == countryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
+
             if (countryCreate == null)
                 return BadRequest(ModelState);
-
-            var country = _countryRepository.GetCountries().Where(c => c.Name.Trim().ToUpper() == countryCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
 
             if (country != null)
             {
@@ -67,7 +61,7 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var countryMap = _mapper.Map<Country>(countryCreate);
+            var countryMap = _countryService.CreateCountry(countryCreate);
 
             if (!_countryRepository.CreateCountry(countryMap))
             {
@@ -82,7 +76,7 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateCategory(int countryId, [FromBody] CountryDto updatedCountry)
+        public IActionResult UpdateCountry(int countryId, [FromBody] CountryDto updatedCountry)
         {
             if (updatedCountry == null)
                 return BadRequest();
@@ -96,7 +90,7 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var countryMap = _mapper.Map<Country>(updatedCountry);
+            var countryMap = _countryService.UpdateCountry(updatedCountry);
 
             if (!_countryRepository.UpdateCountry(countryMap))
             {
@@ -104,7 +98,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Страна {countryMap.Name} - отредактирована в базе данных");
+            return Ok($"Страна отредактирована в базе данных");
         }
 
         [HttpDelete("{countryId}")]
@@ -116,7 +110,7 @@ namespace OfficeStaff.Controllers
             if (!_countryRepository.CountryExists(countryId))
                 return NotFound();
 
-            var countryToDelete = _countryRepository.GetCountry(countryId);
+            var countryToDelete = _countryService.DeleteCountry(countryId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -127,7 +121,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Страна {countryToDelete.Name} - удалена из базы данных");
+            return Ok($"Страна удалена из базы данных");
         }
     }
 }

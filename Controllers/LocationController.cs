@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeStaff.Data.Dto;
-using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
-using OfficeStaff.Data.Repository;
+using OfficeStaff.Data.Repository.Interfaces;
+using OfficeStaff.Data.Services.Interfaces;
 
 namespace OfficeStaff.Controllers
 {
@@ -13,13 +12,13 @@ namespace OfficeStaff.Controllers
     {
         private readonly ILocationRepository _locationRepository;
         private readonly ICountryRepository _countryRepository;
-        private readonly IMapper _mapper;
+        private readonly ILocationService _locationService;
 
-        public LocationController(ILocationRepository locationRepository, ICountryRepository countryRepository , IMapper mapper)
+        public LocationController(ILocationRepository locationRepository, ICountryRepository countryRepository, ILocationService locationService)
         {
             _locationRepository = locationRepository;
             _countryRepository = countryRepository;
-            _mapper = mapper;
+            _locationService = locationService;
         }
 
         [HttpGet]
@@ -27,12 +26,10 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetLocations()
         {
-            var locations = _mapper.Map<List<LocationDto>>(_locationRepository.GetLocations());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(locations);
+            return Ok(_locationService.GetLocations());
         }
 
         [HttpGet("{locationId}")]
@@ -43,13 +40,10 @@ namespace OfficeStaff.Controllers
             if (!_locationRepository.LocationExists(locationId))
                 return NotFound();
 
-            var location = _mapper.Map<LocationDto>(_locationRepository.GetLocation(locationId));
-
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(location);
+            return Ok(_locationService.GetLocation(locationId));
         }
 
         [HttpPost]
@@ -74,10 +68,8 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var locationMap = _mapper.Map<Location>(locationCreate);
+            var locationMap = _locationService.CreateLocation(locationCreate, countryId);
             
-            locationMap.Country = _countryRepository.GetCountry(countryId);    
-
             if (!_locationRepository.CreateLocation(locationMap))
             {
                 ModelState.AddModelError("", "Что-то пошло не так при создании локации");
@@ -99,16 +91,16 @@ namespace OfficeStaff.Controllers
             if (locationId != updatedLocation.Id)
                 return BadRequest();
 
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound("Страна не найдена");
+
             if (!_locationRepository.LocationExists(locationId))
                 return NotFound();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var locationMap = _mapper.Map<Location>(updatedLocation);
-
-            locationMap.Country = _countryRepository.GetCountry(countryId);
-
+            var locationMap = _locationService.UpdateLocation(updatedLocation, countryId);
 
             if (!_locationRepository.UpdateLocation(locationMap))
             {
@@ -116,7 +108,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Локация '{locationMap.Name}' - отредактирована в базе данных");
+            return Ok($"Локация отредактирована в базе данных");
         }
 
         [HttpDelete("{locationId}")]
@@ -128,7 +120,7 @@ namespace OfficeStaff.Controllers
             if (!_locationRepository.LocationExists(locationId))
                 return NotFound();
 
-            var locationToDelete = _locationRepository.GetLocation(locationId);
+            var locationToDelete = _locationService.DeleteLocation(locationId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -139,7 +131,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Локация {locationToDelete.Name} - удалена из базы данных");
+            return Ok($"Локация удалена из базы данных");
         }
     }
 }

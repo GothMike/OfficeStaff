@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
+using OfficeStaff.Data.Repository.Interfaces;
 using OfficeStaff.Persistence;
 
 namespace OfficeStaff.Data.Repository

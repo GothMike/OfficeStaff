@@ -1,4 +1,4 @@
-﻿namespace OfficeStaff.Data.Interfaces
+﻿namespace OfficeStaff.Data.Repository.Interfaces
 {
     public interface IBaseRepository
     {

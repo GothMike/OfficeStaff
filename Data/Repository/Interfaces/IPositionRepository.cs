@@ -1,6 +1,6 @@
 ﻿using OfficeStaff.Data.Models;
 
-namespace OfficeStaff.Data.Interfaces
+namespace OfficeStaff.Data.Repository.Interfaces
 {
     public interface IPositionRepository
     {

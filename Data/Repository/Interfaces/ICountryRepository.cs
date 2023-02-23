@@ -1,8 +1,8 @@
 ﻿using OfficeStaff.Data.Models;
 
-namespace OfficeStaff.Data.Interfaces
+namespace OfficeStaff.Data.Repository.Interfaces
 {
-    public interface ICountryRepository 
+    public interface ICountryRepository
     {
         bool CreateCountry(Country country);
         Country GetCountry(int countryId);

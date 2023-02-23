@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeStaff.Data.Dto;
-using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
-using OfficeStaff.Data.Repository;
+using OfficeStaff.Data.Repository.Interfaces;
+using OfficeStaff.Data.Services.Interfaces;
 
 namespace OfficeStaff.Controllers
 {
@@ -13,25 +12,23 @@ namespace OfficeStaff.Controllers
     {
         private readonly IDepartmentRepository _departmentRepository;
         private readonly ILocationRepository _locationRepository;
-        private readonly IMapper _mapper;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, ILocationRepository locationRepository, IMapper mapper)
+        public DepartmentController(IDepartmentRepository departmentRepository, ILocationRepository locationRepository, IDepartmentService departmentService)
         {
             _departmentRepository = departmentRepository;
             _locationRepository = locationRepository;
-            _mapper = mapper;
+            _departmentService = departmentService;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Department>))]
         public IActionResult GetDepartments()
         {
-            var departments = _mapper.Map<List<DepartmentDto>>(_departmentRepository.GetDepartments());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(departments);
+            return Ok(_departmentService.GetDepartments());
         }
 
         [HttpGet("{departmentId}")]
@@ -42,12 +39,10 @@ namespace OfficeStaff.Controllers
             if (!_departmentRepository.DepartmentExists(departmentId))
                 return NotFound();
 
-            var department = _mapper.Map<DepartmentDto>(_departmentRepository.GetDepartment(departmentId));
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(department);
+            return Ok(_departmentService.GetDepartment(departmentId));
         }
 
         [HttpPost]
@@ -61,20 +56,10 @@ namespace OfficeStaff.Controllers
             if (!_locationRepository.LocationExists(locationId))
                 return NotFound("Локация не найдена");
 
-            var department = _departmentRepository.GetDepartments().Where(c => c.Name.Trim().ToUpper() == departmentCreate.Name.TrimEnd().ToUpper()).FirstOrDefault();
-
-            if (department != null)
-            {
-                ModelState.AddModelError("", "Департамент уже создан");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var departmentMap = _mapper.Map<Department>(departmentCreate);
-
-            departmentMap.Location = _locationRepository.GetLocation(locationId);
+            var departmentMap = _departmentService.CreateDepartment(departmentCreate, locationId);
 
             if (!_departmentRepository.CreateDepartment(departmentMap))
             {
@@ -100,12 +85,13 @@ namespace OfficeStaff.Controllers
             if (!_departmentRepository.DepartmentExists(departmentId))
                 return NotFound();
 
+            if (!_locationRepository.LocationExists(locationId))
+                return NotFound("Локация не найдена");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var departmentMap = _mapper.Map<Department>(departmentCreate);
-
-            departmentMap.Location = _locationRepository.GetLocation(locationId);
+            var departmentMap = _departmentService.UpdateDepartment(departmentCreate, locationId);
 
             if (!_departmentRepository.UpdateDepartment(departmentMap))
             {
@@ -113,7 +99,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Департамент {departmentMap.Name} - отредактирован в базе данных");
+            return Ok($"Департамент отредактирован в базе данных");
         }
 
         [HttpDelete("{departmentId}")]
@@ -125,7 +111,7 @@ namespace OfficeStaff.Controllers
             if (!_departmentRepository.DepartmentExists(departmentId))
                 return NotFound();
 
-            var departmentToDelete = _departmentRepository.GetDepartment(departmentId);
+            var departmentToDelete = _departmentService.DeleteDepartment(departmentId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -136,7 +122,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Департамент {departmentToDelete.Name} - удалена из базы данных");
+            return Ok($"Департамент  удален из базы данных");
         }
     }
 }

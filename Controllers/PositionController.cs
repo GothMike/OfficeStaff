@@ -1,9 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeStaff.Data.Dto;
-using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
-using OfficeStaff.Data.Repository;
+using OfficeStaff.Data.Repository.Interfaces;
+using OfficeStaff.Data.Services.Interfaces;
 
 namespace OfficeStaff.Controllers
 {
@@ -12,12 +11,12 @@ namespace OfficeStaff.Controllers
     public class PositionController : Controller
     {
         private readonly IPositionRepository _positionRepository;
-        private readonly IMapper _mapper;
+        private readonly IPositionService _positionService;
 
-        public PositionController(IPositionRepository positionRepository, IMapper mapper)
+        public PositionController(IPositionRepository positionRepository, IPositionService positionService)
         {
             _positionRepository = positionRepository;
-            _mapper = mapper;
+            _positionService = positionService;
         }
 
         [HttpGet]
@@ -25,12 +24,10 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetPositions()
         {
-            var positions = _mapper.Map<List<PositionDto>>(_positionRepository.GetPositions());
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(positions);
+            return Ok(_positionService.GetPositions());
         }
 
         [HttpGet("{positionId}")]
@@ -41,13 +38,10 @@ namespace OfficeStaff.Controllers
             if (!_positionRepository.PositionExists(positionId))
                 return NotFound();
 
-            var position = _mapper.Map<PositionDto>(_positionRepository.GetPosition(positionId));
-
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(position);
+            return Ok(_positionService.GetPosition(positionId));
         }
 
         [HttpPost]
@@ -69,9 +63,7 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var positionMap = _mapper.Map<Position>(positionCreate);
-
-            positionMap.IsAManagerPosition = isAManagerPosition;
+            var positionMap = _positionService.CreatePosition(positionCreate, isAManagerPosition);
 
             if (!_positionRepository.CreatePosition(positionMap))
             {
@@ -86,7 +78,7 @@ namespace OfficeStaff.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdatePosition(int positionId, [FromBody] PositionDto positionUptade)
+        public IActionResult UpdatePosition(int positionId, [FromQuery] bool isAManagerPosition, [FromBody] PositionDto positionUptade)
         {
             if (positionUptade == null)
                 return BadRequest();
@@ -100,7 +92,7 @@ namespace OfficeStaff.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var positionMap = _mapper.Map<Position>(positionUptade);
+            var positionMap = _positionService.UpdatePosition(positionUptade, isAManagerPosition);
 
             if (!_positionRepository.UpdatePosition(positionMap))
             {
@@ -108,7 +100,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Позиция {positionMap.Name} - отредактирована в базе данных");
+            return Ok($"Позиция отредактирована в базе данных");
         }
 
         [HttpDelete("{positionId}")]
@@ -120,7 +112,7 @@ namespace OfficeStaff.Controllers
             if (!_positionRepository.PositionExists(positionId))
                 return NotFound();
 
-            var positionToDelete = _positionRepository.GetPosition(positionId);
+            var positionToDelete = _positionService.DeletePosition(positionId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,7 +123,7 @@ namespace OfficeStaff.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok($"Позиция {positionToDelete.Name} - удалена из базы данных");
+            return Ok($"Позиция удалена из базы данных");
         }
     }
 }
