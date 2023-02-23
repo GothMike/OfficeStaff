@@ -49,7 +49,7 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<Department> builder)
             {
-                builder.HasOne(e => e.Location).WithMany(c => c.Departments).HasForeignKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(e => e.Location).WithMany(c => c.Departments).OnDelete(DeleteBehavior.Cascade);
                 builder.Property(e => e.Name).IsRequired().HasMaxLength(40);
             }
         }
@@ -86,7 +86,7 @@ namespace OfficeStaff.Persistence
         {
             public void Configure(EntityTypeBuilder<Location> builder)
             {
-                builder.HasOne(e => e.Country).WithMany(e => e.Locations).HasForeignKey(e => e.Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(e => e.Country).WithMany(e => e.Locations).OnDelete(DeleteBehavior.Cascade);
                 builder.Property(e => e.Name).IsRequired().HasMaxLength(50);
                 builder.HasIndex(e => e.Name).IsUnique();
             }

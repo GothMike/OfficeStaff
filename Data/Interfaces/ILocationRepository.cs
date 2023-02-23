@@ -10,6 +10,5 @@ namespace OfficeStaff.Data.Interfaces
         bool UpdateLocation(Location location);
         bool DeleteLocation(Location location);
         bool LocationExists(int locationId);
-        bool Save();
     }
 }

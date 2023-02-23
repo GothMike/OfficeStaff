@@ -10,6 +10,5 @@ namespace OfficeStaff.Data.Interfaces
         bool UpdateEmployee(Employee employee);
         bool DeleteEmployee(Employee employee);
         bool EmployeeExists(int employeeId);
-        bool Save();
     }
 }

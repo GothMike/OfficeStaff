@@ -1,33 +1,37 @@
-﻿using OfficeStaff.Data.Interfaces;
+﻿using AutoMapper;
+using OfficeStaff.Data.Dto;
+using OfficeStaff.Data.Interfaces;
 using OfficeStaff.Data.Models;
 using OfficeStaff.Persistence;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace OfficeStaff.Services
 {
-    public class EmployeeService : IEmployeeService
+    public class EmployeeService
     {
-        readonly private ApplicationContext _applicationContext;
-        public EmployeeService(ApplicationContext applicationContext)
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IPositionRepository _positionRepository;
+        private readonly IMapper _mapper;
+
+        public EmployeeService(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository, IPositionRepository positionRepository, IMapper mapper)
         {
-            _applicationContext = applicationContext;
+            _employeeRepository = employeeRepository;
+            _departmentRepository = departmentRepository;
+            _positionRepository = positionRepository;
+            _mapper = mapper;
         }
 
-        public bool ChangeAPositionAnEmployee(Employee employee)
+        public ICollection<EmployeeDto> GetEmployees()
         {
-            _applicationContext.Update(employee);
-            return Save();
+            var employees = _mapper.Map<List<EmployeeDto>>(_employeeRepository.GetEmployees());
+            return employees;
         }
 
-        public bool SetAManager(Employee employee)
-        {
-            _applicationContext.Update(employee);
-            return Save();
-        }
 
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;
-        }
+
+
+
     }
 }

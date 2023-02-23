@@ -8,22 +8,24 @@ namespace OfficeStaff.Data.Repository
     public class LocationRepository : ILocationRepository
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly IBaseRepository _baseRepository;
 
-        public LocationRepository(ApplicationContext applicationContext)
+        public LocationRepository(ApplicationContext applicationContext, IBaseRepository baseRepository)
         {
             _applicationContext = applicationContext;
+            _baseRepository = baseRepository;
         }
 
         public bool CreateLocation(Location location)
         {
             _applicationContext.Add(location);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool DeleteLocation(Location Location)
         {
             _applicationContext.Remove(Location);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool LocationExists(int locationId)
@@ -44,13 +46,7 @@ namespace OfficeStaff.Data.Repository
         public bool UpdateLocation(Location Location)
         {
             _applicationContext.Locations.Update(Location);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;
+            return _baseRepository.Save();
         }
     }
 }

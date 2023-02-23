@@ -42,15 +42,17 @@ namespace OfficeStaff.Migrations
                 name: "Locations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CountryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Locations_Countries_Id",
-                        column: x => x.Id,
+                        name: "FK_Locations_Countries_CountryId",
+                        column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -60,15 +62,17 @@ namespace OfficeStaff.Migrations
                 name: "Departments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Departments_Locations_Id",
-                        column: x => x.Id,
+                        name: "FK_Departments_Locations_LocationId",
+                        column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -137,6 +141,11 @@ namespace OfficeStaff.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Departments_LocationId",
+                table: "Departments",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",
                 table: "Employees",
                 column: "DepartmentId");
@@ -145,6 +154,11 @@ namespace OfficeStaff.Migrations
                 name: "IX_Employees_PositionId",
                 table: "Employees",
                 column: "PositionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Locations_CountryId",
+                table: "Locations",
+                column: "CountryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Locations_Name",

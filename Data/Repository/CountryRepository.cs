@@ -8,9 +8,11 @@ namespace OfficeStaff.Data.Repository
     public class CountryRepository : ICountryRepository
     {
         private readonly ApplicationContext _applicationContext;
-        public CountryRepository(ApplicationContext applicationContext)
+        private readonly IBaseRepository _baseRepository;
+        public CountryRepository(ApplicationContext applicationContext, IBaseRepository baseRepository)
         {
             _applicationContext = applicationContext;
+            _baseRepository = baseRepository;
         }
 
         public bool CountryExists(int countryId)
@@ -21,13 +23,13 @@ namespace OfficeStaff.Data.Repository
         public bool CreateCountry(Country country)
         {
             _applicationContext.Add(country);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool DeleteCountry(Country country)
         {
             _applicationContext.Remove(country);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public ICollection<Country> GetCountries()
@@ -43,13 +45,7 @@ namespace OfficeStaff.Data.Repository
         public bool UpdateCountry(Country country)
         {
             _applicationContext.Countries.Update(country);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;
+            return _baseRepository.Save();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace OfficeStaff.Data.Interfaces
 {
-    public interface ICountryRepository
+    public interface ICountryRepository 
     {
         bool CreateCountry(Country country);
         Country GetCountry(int countryId);
@@ -10,6 +10,5 @@ namespace OfficeStaff.Data.Interfaces
         bool UpdateCountry(Country country);
         bool DeleteCountry(Country country);
         bool CountryExists(int countryId);
-        bool Save();
     }
 }

@@ -40,12 +40,18 @@ namespace OfficeStaff.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Department", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -55,7 +61,9 @@ namespace OfficeStaff.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Employee", b =>
@@ -91,12 +99,18 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -106,10 +120,12 @@ namespace OfficeStaff.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CountryId");
+
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Position", b =>
@@ -133,7 +149,7 @@ namespace OfficeStaff.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.PositionHistory", b =>
@@ -159,14 +175,14 @@ namespace OfficeStaff.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("PositionHistory");
+                    b.ToTable("PositionHistory", (string)null);
                 });
 
             modelBuilder.Entity("OfficeStaff.Data.Models.Department", b =>
                 {
                     b.HasOne("OfficeStaff.Data.Models.Location", "Location")
                         .WithMany("Departments")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -195,7 +211,7 @@ namespace OfficeStaff.Migrations
                 {
                     b.HasOne("OfficeStaff.Data.Models.Country", "Country")
                         .WithMany("Locations")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

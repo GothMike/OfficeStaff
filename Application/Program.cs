@@ -14,6 +14,7 @@ modelBuilder.Services.AddScoped<ICountryRepository, CountryRepository>();
 modelBuilder.Services.AddScoped<ILocationRepository, LocationRepository>();
 modelBuilder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 modelBuilder.Services.AddScoped<IPositionRepository, PositionRepository>();
+modelBuilder.Services.AddScoped<IBaseRepository, BaseRepository>();
 
 modelBuilder.Services.AddEndpointsApiExplorer();
 modelBuilder.Services.AddSwaggerGen();

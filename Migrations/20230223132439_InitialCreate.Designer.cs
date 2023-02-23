@@ -12,7 +12,7 @@ using OfficeStaff.Persistence;
 namespace OfficeStaff.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230221193407_InitialCreate")]
+    [Migration("20230223132439_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -49,6 +49,12 @@ namespace OfficeStaff.Migrations
             modelBuilder.Entity("OfficeStaff.Data.Models.Department", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -57,6 +63,8 @@ namespace OfficeStaff.Migrations
                         .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Departments");
                 });
@@ -100,6 +108,12 @@ namespace OfficeStaff.Migrations
             modelBuilder.Entity("OfficeStaff.Data.Models.Location", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -108,6 +122,8 @@ namespace OfficeStaff.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -169,7 +185,7 @@ namespace OfficeStaff.Migrations
                 {
                     b.HasOne("OfficeStaff.Data.Models.Location", "Location")
                         .WithMany("Departments")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -198,7 +214,7 @@ namespace OfficeStaff.Migrations
                 {
                     b.HasOne("OfficeStaff.Data.Models.Country", "Country")
                         .WithMany("Locations")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

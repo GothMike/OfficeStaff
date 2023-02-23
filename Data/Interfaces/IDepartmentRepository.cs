@@ -10,6 +10,5 @@ namespace OfficeStaff.Data.Interfaces
         bool UpdateDepartment(Department department);
         bool DeleteDepartment(Department department);
         bool DepartmentExists(int departmentId);
-        bool Save();
     }
 }

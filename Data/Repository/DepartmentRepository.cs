@@ -8,22 +8,24 @@ namespace OfficeStaff.Data.Repository
     public class DepartmentRepository : IDepartmentRepository
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly IBaseRepository _baseRepository;
 
-        public DepartmentRepository(ApplicationContext applicationContext)
+        public DepartmentRepository(ApplicationContext applicationContext, IBaseRepository baseRepository)
         {
             _applicationContext = applicationContext;
+            _baseRepository = baseRepository;
         }
 
         public bool CreateDepartment(Department department)
         {
             _applicationContext.Add(department);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool DeleteDepartment(Department department)
         {
             _applicationContext.Remove(department);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool DepartmentExists(int departmentId)
@@ -44,13 +46,7 @@ namespace OfficeStaff.Data.Repository
         public bool UpdateDepartment(Department department)
         {
             _applicationContext.Departments.Update(department);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;
+            return _baseRepository.Save();
         }
     }
 }

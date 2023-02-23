@@ -8,23 +8,16 @@ namespace OfficeStaff.Data.Repository
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly IBaseRepository _baseRepository;
 
-        public EmployeeRepository(ApplicationContext applicationContext)
+        public EmployeeRepository(ApplicationContext applicationContext, IBaseRepository baseRepository)
         {
             _applicationContext = applicationContext;
+            _baseRepository = baseRepository;
         }
 
         public bool CreateEmployee(Employee employee, int departmentId, int positionId)
         {
-            /*var employeeDepartmentEntity = _applicationContext.Departments.Where(d => d.Id == departmentId).FirstOrDefault();
-            var employeePositionEntity = _applicationContext.Positions.Where(p => p.Id == positionId).FirstOrDefault();
-            
-            var newEmployee = new Employee()
-            {
-                Department = employeeDepartmentEntity,
-                Position = employeePositionEntity
-            };*/
-
             var positionHistory = new PositionHistory()
             {
                 Employee = employee,
@@ -35,14 +28,13 @@ namespace OfficeStaff.Data.Repository
             _applicationContext.PositionHistory.Add(positionHistory);
             _applicationContext.Add(employee);
 
-            return Save();
+            return _baseRepository.Save();
         }
-
 
         public bool DeleteEmployee(Employee employee)
         {
             _applicationContext.Remove(employee);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool EmployeeExists(int employeeId)
@@ -62,13 +54,7 @@ namespace OfficeStaff.Data.Repository
         public bool UpdateEmployee(Employee employee)
         {
             _applicationContext.Employees.Update(employee);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;    
+            return _baseRepository.Save();
         }
     }
 }

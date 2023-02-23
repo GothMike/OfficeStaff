@@ -7,22 +7,24 @@ namespace OfficeStaff.Data.Repository
     public class PositionRepository : IPositionRepository
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly IBaseRepository _baseRepository;
 
-        public PositionRepository(ApplicationContext applicationContext)
+        public PositionRepository(ApplicationContext applicationContext, IBaseRepository baseRepository)
         {
             _applicationContext = applicationContext;
+            _baseRepository = baseRepository;
         }
 
         public bool CreatePosition(Position position)
         {
             _applicationContext.Add(position);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool DeletePosition(Position position)
         {
             _applicationContext.Remove(position);
-            return Save();
+            return _baseRepository.Save();
         }
 
         public bool PositionExists(int positionId)
@@ -43,13 +45,7 @@ namespace OfficeStaff.Data.Repository
         public bool UpdatePosition(Position position)
         {
             _applicationContext.Positions.Update(position);
-            return Save();
-        }
-
-        public bool Save()
-        {
-            var saved = _applicationContext.SaveChanges();
-            return saved > 0 ? true : false;
+            return _baseRepository.Save();
         }
     }
 }

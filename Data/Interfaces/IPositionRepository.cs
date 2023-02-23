@@ -10,6 +10,5 @@ namespace OfficeStaff.Data.Interfaces
         bool UpdatePosition(Position position);
         bool DeletePosition(Position position);
         bool PositionExists(int positionId);
-        bool Save();
     }
 }
