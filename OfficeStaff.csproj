@@ -21,12 +21,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Data\Interfaces\" />
-    <Folder Include="Data\Repository\" />
-    <Folder Include="Domain\" />
-    <Folder Include="Helper\" />
-  </ItemGroup>
-
 </Project>
