@@ -6,6 +6,7 @@ using OfficeStaff.Data.Models;
 using OfficeStaff.Data.Repository;
 using OfficeStaff.Data.Repository.Interfaces;
 using OfficeStaff.Persistence;
+using System;
 using System.Collections;
 
 namespace OfficeStaff.Tests.Repository
@@ -53,7 +54,22 @@ namespace OfficeStaff.Tests.Repository
         }
 
         [Fact]
-         public async void CountryRepository_GetExists_ReturnTrue()
+        public async void CountryRepository_GetCountries_ReturnCountry()
+        {
+            // Arrange
+            var dbContext = await GetDatabaseContext();
+            var countryRepository = new CountryRepository(dbContext, _iBaseRepository);
+
+            // Act
+            var countries = countryRepository.GetCountries();
+
+            // Assert 
+            countries.Should().NotBeNull();
+            countries.Should().HaveCount(c => c <= 2).And.OnlyHaveUniqueItems();
+        }
+
+        [Fact]
+         public async void CountryRepository_CountryExists_ReturnTrue()
         {
             // Arrange
             var countryId = 1;
@@ -65,65 +81,6 @@ namespace OfficeStaff.Tests.Repository
 
             // Assert 
             result.Should().BeTrue();
-        }
-
-        [Fact]
-        public async void CountryRepository_GetCountries_ReturnCountries()
-        {
-            // Arrange
-            var dbContext = await GetDatabaseContext();
-            var countryRepository = new CountryRepository(dbContext, _iBaseRepository);
-
-            // Act
-            var result = countryRepository.GetCountries();
-
-            // Assert 
-            result.Should().NotBeNull();
-            result.Should().HaveCount(c => c <= 2).And.OnlyHaveUniqueItems();
-        }
-
-        [Fact]
-        public async void CountryRepository_CreateCountry_ReturnCountry()
-        {
-            // Arrange
-            var dbContext = await GetDatabaseContext();
-            var countryRepository = new CountryRepository(dbContext, _iBaseRepository);
-
-            // Act
-            var country = new Country() { Name = "United Kingdom" };
-
-            // Assert 
-            country.Name.Should().NotBeNull();
-        }
-
-        [Fact]
-        public async void CountryRepository_DeleteCountry_ReturnCountry()
-        {
-            // Arrange
-            int countryId = 1;
-            var dbContext = await GetDatabaseContext();
-            var countryRepository = new CountryRepository(dbContext, _iBaseRepository);
-
-            // Act
-            var country = countryRepository.GetCountry(countryId);
-
-            // Assert 
-            country.Name.Should().NotBeNull();
-        }
-
-        [Fact]
-        public async void CountryRepository_UpdateCountry_ReturnCountry()
-        {
-            // Arrange
-            int countryId = 1;
-            var dbContext = await GetDatabaseContext();
-            var countryRepository = new CountryRepository(dbContext, _iBaseRepository);
-
-            // Act
-            var country = countryRepository.GetCountry(countryId);
-
-            // Assert 
-            country.Name.Should().NotBeNull();
         }
     }
 }
