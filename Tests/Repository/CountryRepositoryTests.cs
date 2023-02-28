@@ -1,13 +1,10 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory;
 using OfficeStaff.Data.Models;
 using OfficeStaff.Data.Repository;
 using OfficeStaff.Data.Repository.Interfaces;
 using OfficeStaff.Persistence;
-using System;
-using System.Collections;
 
 namespace OfficeStaff.Tests.Repository
 {
@@ -17,7 +14,6 @@ namespace OfficeStaff.Tests.Repository
         public CountryRepositoryTests()
         {
             _iBaseRepository = A.Fake<IBaseRepository>();
-
         }
 
         public async Task<ApplicationContext> GetDatabaseContext()
